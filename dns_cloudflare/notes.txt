@@ -1,0 +1,8 @@
+These are scripts to use with Certera to create cloudflare dns records for
+ACME.
+
+Sleep times are tuned to allow dns settings to propagate, including up to 3
+dns entries for one cert.
+
+nohup in del script allows process to fork without certera timing out at the
+60 second mark
