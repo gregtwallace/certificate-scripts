@@ -3,6 +3,10 @@
 # Script converts key/cert into pfx and then updates them
 # in unifi's keystore. It also restarts the unifi service.
 
+# This script should be securely placed with limited access
+# (e.g. owned by root with permissions of 700) to avoid
+# compromising the API Keys
+
 # The Unifi Controller does NOT support ECDSA Keys as of 2022.08.27
 
 ## Recommended cron -- run at boot (in case system was powered off
