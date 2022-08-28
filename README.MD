@@ -1,9 +1,13 @@
 This repo holds various scripts to fetch keys and certificates
-from Certera. As LeGo Certhub development continues, they will
-be updated (if needed) to work with LeGo Certhub. They should
-also work with any other program that implements the same API.
+from a central host.
 
-full-chain-pem.sh is the most generic script
+The root contains scripts designed to work with LeGo Certhub
+but are also generic enough to modify for other providers.
+
+The certera path contains scripts designed to work with
+Certera in particular.
 
 dns_cloudflare contains scripts Certera can call to properly
 add and remove ACME dns records on Cloudflare.
+
+full-chain-pem.sh is the most generic script
