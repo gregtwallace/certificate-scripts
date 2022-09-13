@@ -101,8 +101,8 @@ for i in "${!idrac_list[@]}"; do
 	cert_diffcode=$?
 	# no way to fetch key, so just replace key anytime cert changes
 
+	# if different
 	if ( test $cert_diffcode != 0 ) ; then
-	
 		# fetch key, fail out if error
 		http_statuscode=$(sudo curl https://$server/$api_key_path/${idrac_list[$i]} -H "apiKey: ${key_apikey[$i]}" --output $temp_certs/key.pem --write-out "%{http_code}")
 		if test $http_statuscode -ne 200; then continue; fi
@@ -110,9 +110,7 @@ for i in "${!idrac_list[@]}"; do
 		sudo $racadm_cmd ${strict_mode}-r "${idrac_list["$i"]}" -u "${idrac_user["$i"]}" -p "${idrac_password["$i"]}" sslkeyupload -t 1 -f $temp_certs/key.pem
 		sudo $racadm_cmd ${strict_mode}-r "${idrac_list["$i"]}" -u "${idrac_user["$i"]}" -p "${idrac_password["$i"]}" sslcertupload -t 1 -f $temp_certs/certchain.cer
 		sudo $racadm_cmd ${strict_mode}-r "${idrac_list["$i"]}" -u "${idrac_user["$i"]}" -p "${idrac_password["$i"]}" racreset
-
 	fi
-
 done
 
 rm -rf $temp_certs

@@ -47,20 +47,18 @@ if test $http_statuscode -ne 200; then exit "$http_statuscode"; fi
 http_statuscode=$(sudo curl https://$server/$api_key_path -H "apiKey: $key_apikey" --out $temp_certs/key.pem --write-out "%{http_code}")
 if test $http_statuscode -ne 200; then exit "$http_statuscode"; fi
 
+# if different
 if ( ! cmp -s "$temp_certs/certchain.pem" "$local_certs/certchain.pem" ) || ( ! cmp -s "$temp_certs/key.pem" "$local_certs/key.pem" ) ; then
+	sudo service AdGuardHome stop
 
-		echo "different"
+	sudo cp -rf $temp_certs/* $local_certs/
 
-        sudo service AdGuardHome stop
+	sudo chown $cert_owner:$cert_owner $local_certs/*
 
-        sudo cp -rf $temp_certs/* $local_certs/
+	sudo chmod 600 $local_certs/key.pem
+	sudo chmod 644 $local_certs/certchain.pem
 
-        sudo chown $cert_owner:$cert_owner $local_certs/*
-
-        sudo chmod 600 $local_certs/key.pem
-        sudo chmod 644 $local_certs/certchain.pem
-
-        sudo service AdGuardHome start
+	sudo service AdGuardHome start
 fi
 
 sudo rm -rf $local_certs/temp

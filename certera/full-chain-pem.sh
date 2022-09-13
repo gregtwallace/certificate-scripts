@@ -35,23 +35,21 @@ if test $http_statuscode -ne 200; then exit "$http_statuscode"; fi
 http_statuscode=$(sudo curl https://$server/api/key/$cert_name -H "apiKey: $key_apikey" --out $local_certs/temp/privkey.pem --write-out "%{http_code}")
 if test $http_statuscode -ne 200; then exit "$http_statuscode"; fi
 
+# if different
 if ( ! cmp -s "$local_certs/temp/fullchain.pem" "$local_certs/fullchain.pem" ) || ( ! cmp -s "$local_certs/temp/privkey.pem" "$local_certs/privkey.pem" ) ; then
+	# if desired, stop services
+	# sudo service SomeService stop
 
-		echo "different"
+	sudo cp -rf $local_certs/temp/* $local_certs/
 
-        # if desired, stop services
-        # sudo service SomeService stop
+	# set owner as appropriate
+	sudo chown $user:$user $local_certs/*
 
-        sudo cp -rf $local_certs/temp/* $local_certs/
+	sudo chmod 600 $local_certs/privkey.pem
+	sudo chmod 644 $local_certs/fullchain.pem
 
-        # set owner as appropriate
-        sudo chown $user:$user $local_certs/*
-
-        sudo chmod 600 $local_certs/privkey.pem
-        sudo chmod 644 $local_certs/fullchain.pem
-
-        # if desired, start services
-        # sudo service SomeService start
+	# if desired, start services
+	# sudo service SomeService start
 fi
 
 sudo rm -rf $local_certs/temp

@@ -31,18 +31,18 @@ if test $http_statuscode -ne 200; then exit "$http_statuscode"; fi
 http_statuscode=$(sudo curl https://$server/api/key/$cert_name -H "apiKey: $key_apikey" --out $local_certs/temp/key.pem --write-out "%{http_code}")
 if test $http_statuscode -ne 200; then exit "$http_statuscode"; fi
 
+# if different
 if ( ! cmp -s "$local_certs/temp/certchain.pem" "$local_certs/certchain.pem" ) || ( ! cmp -s "$local_certs/temp/key.pem" "$local_certs/key.pem" ) ; then
+	sudo service apache2 stop
 
-        sudo service apache2 stop
+	sudo cp -rf $local_certs/temp/* $local_certs/
 
-        sudo cp -rf $local_certs/temp/* $local_certs/
+	sudo chown root:root $local_certs/*
 
-        sudo chown root:root $local_certs/*
+	sudo chmod 600 $local_certs/key.pem
+	sudo chmod 644 $local_certs/certchain.pem
 
-        sudo chmod 600 $local_certs/key.pem
-        sudo chmod 644 $local_certs/certchain.pem
-
-        sudo service apache2 start
+	sudo service apache2 start
 fi
 
 sudo rm -rf $local_certs/temp

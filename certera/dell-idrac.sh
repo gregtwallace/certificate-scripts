@@ -86,6 +86,7 @@ for i in "${!idrac_list[@]}"; do
 	#diff_status=$(sudo diff "$temp_certs/rui.key" "$esxi_certs/rui.key")
 	#key_diffcode=$?
 
+	# if different
 	if ( test $cert_diffcode != 0 ) ; then
 
 		sudo $racadm_cmd -r "${idrac_list["$i"]}" -u "${idrac_user["$i"]}" -p "${idrac_password["$i"]}" sslkeyupload -t 1 -f $temp_certs/key.pem
@@ -93,7 +94,6 @@ for i in "${!idrac_list[@]}"; do
 		sudo $racadm_cmd -r "${idrac_list["$i"]}" -u "${idrac_user["$i"]}" -p "${idrac_password["$i"]}" racreset
 
 	fi
-
 done
 
 rm -rf $temp_certs

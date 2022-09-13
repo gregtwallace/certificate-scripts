@@ -94,9 +94,8 @@ for i in "${!edgesw_list[@]}"; do
 	diff_status=$(sudo diff "$temp_certs/certchain.pem" "$temp_certs/edgeswchain.pem")
 	cert_diffcode=$?
 
+	# if different
 	if ( test $cert_diffcode != 0 ) ; then
-
-		echo "different"
 
 		## Convert the certs and key into the files needed for the switch upload
 		# Split the certchain ( = cert, 1 = intermediate cert, 2 = More intermediate(??) 3 = CA cert)
@@ -163,8 +162,6 @@ for i in "${!edgesw_list[@]}"; do
 		rm -rf "$tftp_root/${key_apikey[$i]}"
 
 	fi
-
-
 done
 
 rm -rf $temp_certs
