@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Script converts key/cert into pfx and then updates them
-# in unifi's keystore. It also restarts the unifi service.
+# Script updates AdGuard certchain and key. It also restarts
+# the AdGuard service.
 
 # This script should be securely placed with limited access
 # (e.g. owned by root with permissions of 700) to avoid
