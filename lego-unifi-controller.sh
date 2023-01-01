@@ -44,9 +44,9 @@ sudo rm -rf $temp_certs
 sudo mkdir $temp_certs
 sudo mkdir -p $app_certs
 # Fetch certs, if curl returns anything other than 200 success, abort
-http_statuscode=$(sudo curl https://$server/$api_cert_path -H "apiKey: $cert_apikey" --out $temp_certs/certchain.pem --write-out "%{http_code}")
+http_statuscode=$(sudo curl https://$server/$api_cert_path -H "apiKey: $cert_apikey" --output $temp_certs/certchain.pem --write-out "%{http_code}")
 if test $http_statuscode -ne 200; then exit "$http_statuscode"; fi
-http_statuscode=$(sudo curl https://$server/$api_key_path -H "apiKey: $key_apikey" --out $temp_certs/key.pem --write-out "%{http_code}")
+http_statuscode=$(sudo curl https://$server/$api_key_path -H "apiKey: $key_apikey" --output $temp_certs/key.pem --write-out "%{http_code}")
 if test $http_statuscode -ne 200; then exit "$http_statuscode"; fi
 
 # if different
@@ -61,10 +61,10 @@ if ( ! cmp -s "$temp_certs/certchain.pem" "$app_certs/certchain.pem" ) || ( ! cm
 	sudo chmod 600 $app_certs/certchain_key.pfx
 	sudo chmod 644 $app_certs/certchain.pem
 
-	sudo keytool -delete -alias 1 -keystore $unifi_keystore -deststorepass "aircontrolenterprise"
-	sudo keytool -importkeystore -srckeystore $app_certs/certchain_key.pfx -srcstoretype PKCS12 -srcstorepass "" -destkeystore $unifi_keystore \
-		-deststorepass "aircontrolenterprise" -destkeypass "aircontrolenterprise" -alias 1 -trustcacerts
-	
+  sudo keytool -delete -alias 1 -keystore $unifi_keystore -deststorepass "aircontrolenterprise"
+  sudo keytool -importkeystore -srckeystore $app_certs/certchain_key.pfx -srcstoretype PKCS12 -srcstorepass "" -destkeystore $unifi_keystore \
+		  -deststorepass "aircontrolenterprise" -destkeypass "aircontrolenterprise" -trustcacerts
+
 	sudo systemctl start unifi
 fi
 
