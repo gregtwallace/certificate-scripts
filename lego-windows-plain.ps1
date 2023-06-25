@@ -29,7 +29,7 @@ $CurrentCertExpireTime = (Get-ChildItem -Path "Cert:\LocalMachine\My" | Where-Ob
 $CurrentTime = Get-Date
 
 
-If ($CurrentCertExpireTime -lt $CurrentTime) {
+If ($CurrentCertExpireTime -gt $CurrentTime) {
     Write-Host "Certificate Expired, re-registering"
     ## Script
     # Make folder if it doesn't exist
