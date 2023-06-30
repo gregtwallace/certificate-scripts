@@ -43,8 +43,8 @@ server=certdp.local:port
 cert_name=esxi.example.com
 
 # URL paths
-api_cert_path=api/v1/download/certificates/$cert_name
-api_key_path=api/v1/download/privatekeys/$cert_name
+api_cert_path=legocerthub/api/v1/download/certificates/$cert_name
+api_key_path=legocerthub/api/v1/download/privatekeys/$cert_name
 
 # other
 esxi_certs=/etc/vmware/ssl

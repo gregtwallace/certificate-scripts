@@ -45,8 +45,8 @@ idrac_password[2]=<password>
 # server hosting key/cert
 server=certdp.local:port
 # URL paths
-api_cert_path=api/v1/download/certificates
-api_key_path=api/v1/download/privatekeys
+api_cert_path=legocerthub/api/v1/download/certificates
+api_key_path=legocerthub/api/v1/download/privatekeys
 # path to `racadm` binary (goracadm is recommended: https://github.com/gregtwallace/goracadm)
 racadm_cmd=/opt/goracadm/goracadm-amd64-linux
 # racadm strict mode flag ("-S " for strict, "" for insecure)

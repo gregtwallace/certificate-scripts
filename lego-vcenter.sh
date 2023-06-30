@@ -38,8 +38,8 @@ sso_password=<password>
 root_pem=/opt/lego/isrgrootx1.pem
 
 # URL paths
-api_cert_path=api/v1/download/certificates/$cert_name
-api_key_path=api/v1/download/privatekeys/$cert_name
+api_cert_path=legocerthub/api/v1/download/certificates/$cert_name
+api_key_path=legocerthub/api/v1/download/privatekeys/$cert_name
 # temp folder
 temp_certs=/tmp/tempcerts
 # path to store a timestamp to easily see when script last ran
