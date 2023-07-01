@@ -7,6 +7,7 @@
 # Please add more error handling if you're using in production.
 
 # Run this in an admin powershell window. It will not add to the correct store/fail if you don't.
+#Requires -RunAsAdministrator
 
 # Variables for script
 $CertificateAPIKey = "<certificate API key>"
@@ -33,7 +34,7 @@ If ($CurrentCertExpireTime -gt $CurrentTime) {
     If (!(Get-ChildItem $TempCerts -ErrorAction SilentlyContinue)) {
     Write-Host "Creating Temp Directory"
         Try {
-            $OutNull = New-Item $TempCerts
+            $OutNull = New-Item $TempCerts -ItemType Directory
         } Catch {
             Write-Host "Failed to make directory!"
             Write-Host "Error: $_"
