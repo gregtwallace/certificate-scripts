@@ -64,8 +64,8 @@ edgesw_password[2]=<password>
 # API must be running on port 443
 server=certdp.local
 # URL paths
-api_privatecert_path=api/v1/download/privatecerts
-api_carootchain_path=api/v1/download/certrootchains
+api_privatecert_path=legocerthub/api/v1/download/privatecerts
+api_carootchain_path=legocerthub/api/v1/download/certrootchains
 # local user who will own certs
 cert_owner=root
 # path to store a timestamp to easily see when script last ran
