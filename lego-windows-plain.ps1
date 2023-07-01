@@ -15,17 +15,22 @@ $KeyAPIKey = "<key API key>"
 $Server = "<certhubserver:port>"
 $CertHubCertName = "<display name of certificate in certhub>"
 $KeyName = "<display name of key in certhub>"
-$CertificateAPIURL = "legocerthub/api/v1/download/certificates/$CertHubCertName"
-$KeyAPIURL = "legocerthub/api/v1/download/privatekeys/$KeyName"
+$CertSubject = "<cert subject, e.g. testing.mytld.com>"
+
+# May need/want to edit
 $TempCerts = "C:\Windows\temp\tempcerts"
 $OpenSSLLocation = "C:\Program Files\OpenSSL-Win64\bin\openssl.exe"
+$PKCS12Password = "Password"
+
+# Shouldn't need to edit
+$EncryptedPassword = ConvertTo-SecureString -String $PKCS12Password -Force -AsPlainText
+$CertificateAPIURL = "legocerthub/api/v1/download/certificates/$CertHubCertName"
+$KeyAPIURL = "legocerthub/api/v1/download/privatekeys/$KeyName"
+$CurrentCertExpireTime = (Get-ChildItem -Path "Cert:\LocalMachine\My" | Where-Object {$_.Subject -Like "*$CertSubject"}).NotAfter
+$CurrentTime = Get-Date
 $CertPath = "$TempCerts\certchain.crt"
 $KeyPath = "$TempCerts\key.key"
 $PKCS12Path = "$TempCerts\output.pfx"
-$PKCS12Password = "Password"
-$EncryptedPassword = ConvertTo-SecureString -String $PKCS12Password -Force -AsPlainText
-$CurrentCertExpireTime = (Get-ChildItem -Path "Cert:\LocalMachine\My" | Where-Object {$_.Subject -Like "*subdomain.domain.com"}).NotAfter
-$CurrentTime = Get-Date
 
 # Main
 If ($CurrentCertExpireTime -gt $CurrentTime) {
