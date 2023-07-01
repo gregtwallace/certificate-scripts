@@ -33,7 +33,7 @@ $KeyPath = "$TempCerts\key.key"
 $PKCS12Path = "$TempCerts\output.pfx"
 
 # Main
-If ($CurrentCertExpireTime -gt $CurrentTime) {
+If ($CurrentCertExpireTime -gt $CurrentTime -Or [string]::IsNullOrWhiteSpace($CurrentCertExpireTime)) {
     Write-Host "Certificate Expired, re-registering"
     # Make folder if it doesn't exist
     If (!(Get-ChildItem $TempCerts -ErrorAction SilentlyContinue)) {
