@@ -26,7 +26,7 @@ $PKCS12Password = "Password"
 $EncryptedPassword = ConvertTo-SecureString -String $PKCS12Password -Force -AsPlainText
 $CertificateAPIURL = "legocerthub/api/v1/download/certificates/$CertHubCertName"
 $KeyAPIURL = "legocerthub/api/v1/download/privatekeys/$KeyName"
-$CurrentCertExpireTime = (Get-ChildItem -Path "Cert:\LocalMachine\My" | Where-Object { $_.Subject -Like "*$CertSubject" }).NotAfter
+$CurrentCertExpireTime = (Get-ChildItem -Path "Cert:\LocalMachine\My" | Where-Object { $_.Subject -Like "*$CertSubject"} | Sort-Object -Property NotAfter -Descending | Select-Object -First 1).NotAfter
 $CertPath = "$TempCerts\certchain.crt"
 $KeyPath = "$TempCerts\key.key"
 $PKCS12Path = "$TempCerts\output.pfx"
@@ -70,9 +70,6 @@ $legoCert = New-Object Security.Cryptography.X509Certificates.X509Certificate2 "
 # If LeGo cert has longer validity (or doesn't exist on host yet), update
 If ($CurrentCertExpireTime -lt $legoCert.NotAfter -Or [string]::IsNullOrWhiteSpace($CurrentCertExpireTime)) {
     Write-Host "Newer certificate available, updating"
-
-    # Remove old cert
-    $null = (Get-ChildItem -Path "Cert:\LocalMachine\My" | Where-Object { $_.Subject -Like "*$CertSubject" }) | Remove-Item -Force
 
     # Get key from CertHub
     Try {
