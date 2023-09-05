@@ -61,9 +61,9 @@ if [ ! -z $1 ]; then sleep "$1"; fi
 mkdir $temp_certs
 # Fetch LeGo
 http_statuscode=$(wget https://$server/$api_cert_path --header="apiKey: $cert_apikey" -O $temp_certs/rui.crt --server-response 2>&1 | tee /dev/tty | awk '/^  HTTP/{print $2}')
-if test $http_statuscode -ne 200; then exit 1; fi
+if [ "$http_statuscode" != "200" ]; then exit 1; fi
 http_statuscode=$(wget https://$server/$api_key_path --header="apiKey: $key_apikey" -O $temp_certs/rui.key --server-response 2>&1 | tee /dev/tty | awk '/^  HTTP/{print $2}')
-if test $http_statuscode -ne 200; then exit 1; fi
+if [ "$http_statuscode" != "200" ]; then exit 1; fi
 
 diff_status=$(diff "$temp_certs/rui.crt" "$esxi_certs/rui.crt")
 cert_diffcode=$?
