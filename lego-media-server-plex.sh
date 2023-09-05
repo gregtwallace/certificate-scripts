@@ -46,9 +46,9 @@ sudo mkdir -p $plex_certs
 sudo mkdir -p $nginx_certs
 
 # Fetch certs, if curl returns anything other than 200 success, abort
-http_statuscode=$(sudo curl https://$server/$api_cert_path -H "apiKey: $cert_apikey" --out $temp_certs/certchain.pem --write-out "%{http_code}")
+http_statuscode=$(sudo -L curl https://$server/$api_cert_path -H "apiKey: $cert_apikey" --out $temp_certs/certchain.pem --write-out "%{http_code}")
 if test $http_statuscode -ne 200; then exit "$http_statuscode"; fi
-http_statuscode=$(sudo curl https://$server/$api_key_path -H "apiKey: $key_apikey" --out $temp_certs/key.pem --write-out "%{http_code}")
+http_statuscode=$(sudo -L curl https://$server/$api_key_path -H "apiKey: $key_apikey" --out $temp_certs/key.pem --write-out "%{http_code}")
 if test $http_statuscode -ne 200; then exit "$http_statuscode"; fi
 
 # Update plex

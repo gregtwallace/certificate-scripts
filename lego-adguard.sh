@@ -42,9 +42,9 @@ sudo rm -rf $temp_certs
 sudo mkdir $temp_certs
 sudo mkdir -p $local_certs
 # Fetch certs, if curl returns anything other than 200 success, abort
-http_statuscode=$(sudo curl https://$server/$api_cert_path -H "apiKey: $cert_apikey" --out $temp_certs/certchain.pem --write-out "%{http_code}")
+http_statuscode=$(sudo curl -L https://$server/$api_cert_path -H "apiKey: $cert_apikey" --out $temp_certs/certchain.pem --write-out "%{http_code}")
 if test $http_statuscode -ne 200; then exit "$http_statuscode"; fi
-http_statuscode=$(sudo curl https://$server/$api_key_path -H "apiKey: $key_apikey" --out $temp_certs/key.pem --write-out "%{http_code}")
+http_statuscode=$(sudo curl -L https://$server/$api_key_path -H "apiKey: $key_apikey" --out $temp_certs/key.pem --write-out "%{http_code}")
 if test $http_statuscode -ne 200; then exit "$http_statuscode"; fi
 
 # if different

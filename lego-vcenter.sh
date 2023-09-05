@@ -52,7 +52,7 @@ vecs_cli="/usr/lib/vmware-vmafd/bin/vecs-cli"
 mkdir $temp_certs
 
 # Fetch LeGo cert
-http_statuscode=$(curl https://$server/$api_cert_path -H "apiKey: $cert_apikey" --output $temp_certs/certchain.pem --write-out "%{http_code}")
+http_statuscode=$(curl -L https://$server/$api_cert_path -H "apiKey: $cert_apikey" --output $temp_certs/certchain.pem --write-out "%{http_code}")
 if test $http_statuscode -ne 200; then exit "$http_statuscode"; fi
 
 # Split the certchain (0 = cert, 1 = intermediate cert, 2 = CA cert)
@@ -71,7 +71,7 @@ cert_diffcode=$?
 if ( test $cert_diffcode != 0 ) ; then
 
 	# Get Key
-	http_statuscode=$(curl https://$server/$api_key_path -H "apiKey: $key_apikey" --output $temp_certs/key.pem --write-out "%{http_code}")
+	http_statuscode=$(curl -L https://$server/$api_key_path -H "apiKey: $key_apikey" --output $temp_certs/key.pem --write-out "%{http_code}")
 	if test $http_statuscode -ne 200; then exit "$http_statuscode"; fi
 
 	# Create signing chain with root

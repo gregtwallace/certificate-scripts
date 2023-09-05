@@ -89,7 +89,7 @@ for i in "${!edgesw_list[@]}"; do
 	sudo rm -rf "$temp_certs"'/*'
 
 	# Fetch private cert; end this iteration of the loop if curl doesn't work properly
-	http_statuscode=$(sudo curl https://$server/$api_privatecert_path/${edgesw_cert_name[$i]} -H "apiKey: ${cert_apikey[$i]}.${key_apikey[$i]}" --output $temp_certs/privatecert.pem --write-out "%{http_code}" -G)
+	http_statuscode=$(sudo curl -L https://$server/$api_privatecert_path/${edgesw_cert_name[$i]} -H "apiKey: ${cert_apikey[$i]}.${key_apikey[$i]}" --output $temp_certs/privatecert.pem --write-out "%{http_code}" -G)
 	if test $http_statuscode -ne 200; then continue; fi
 
 	# Fetch top cert from the switch by connecting with SSL (don't fail out if cert isn't collected, instead assume SSL isn't configured yet and continue)
