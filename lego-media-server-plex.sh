@@ -43,49 +43,49 @@ temp_certs=/tmp/tempcerts
 # stop / fail on any error
 set -e
 
-sudo rm -rf $temp_certs
-sudo mkdir $temp_certs
-sudo mkdir -p $plex_certs
-sudo mkdir -p $nginx_certs
+rm -rf $temp_certs
+mkdir -p $temp_certs
+mkdir -p $plex_certs
+mkdir -p $nginx_certs
 
 # Fetch certs, if curl returns anything other than 200 success, abort
-http_statuscode=$(sudo -L curl https://$server/$api_cert_path -H "apiKey: $cert_apikey" --out $temp_certs/certchain.pem --write-out "%{http_code}")
+http_statuscode=$(-L curl https://$server/$api_cert_path -H "apiKey: $cert_apikey" --out $temp_certs/certchain.pem --write-out "%{http_code}")
 if test $http_statuscode -ne 200; then exit "$http_statuscode"; fi
-http_statuscode=$(sudo -L curl https://$server/$api_key_path -H "apiKey: $key_apikey" --out $temp_certs/key.pem --write-out "%{http_code}")
+http_statuscode=$(-L curl https://$server/$api_key_path -H "apiKey: $key_apikey" --out $temp_certs/key.pem --write-out "%{http_code}")
 if test $http_statuscode -ne 200; then exit "$http_statuscode"; fi
 
 # Update plex
 # if different
 if ( ! cmp -s "$temp_certs/certchain.pem" "$plex_certs/certchain.pem" ) || ( ! cmp -s "$temp_certs/key.pem" "$plex_certs/key.pem" ) ; then
-	sudo service plexmediaserver stop
+	service plexmediaserver stop
 
-	sudo cp -rf $temp_certs/* $plex_certs/
-	sudo openssl pkcs12 -inkey $plex_certs/key.pem -in $plex_certs/certchain.pem -export -out $plex_certs/certchain_key.pfx -passout pass:""
+	cp -rf $temp_certs/* $plex_certs/
+	openssl pkcs12 -inkey $plex_certs/key.pem -in $plex_certs/certchain.pem -export -out $plex_certs/certchain_key.pfx -passout pass:""
 
-	sudo chown $plex_user:$plex_user $plex_certs/*
-	sudo chown $plex_user:$plex_user $plex_certs/*
+	chown $plex_user:$plex_user $plex_certs/*
+	chown $plex_user:$plex_user $plex_certs/*
 
-	sudo chmod 600 $plex_certs/key.pem
-	sudo chmod 644 $plex_certs/certchain.pem
-	sudo chmod 600 $plex_certs/certchain_key.pfx
+	chmod 600 $plex_certs/key.pem
+	chmod 644 $plex_certs/certchain.pem
+	chmod 600 $plex_certs/certchain_key.pfx
 
-	sudo service plexmediaserver start
+	service plexmediaserver start
 fi
 
 # Update nginx (reverse proxy)
 # if different
 if ( ! cmp -s "$temp_certs/certchain.pem" "$nginx_certs/certchain.pem" ) || ( ! cmp -s "$temp_certs/key.pem" "$nginx_certs/key.pem" ) ; then
-	sudo service nginx stop
+	service nginx stop
 
-	sudo cp -rf $temp_certs/* $nginx_certs/
+	cp -rf $temp_certs/* $nginx_certs/
 
-	sudo chown root:root $nginx_certs/*
+	chown root:root $nginx_certs/*
 
-	sudo chmod 600 $nginx_certs/key.pem
-	sudo chmod 644 $nginx_certs/certchain.pem
+	chmod 600 $nginx_certs/key.pem
+	chmod 644 $nginx_certs/certchain.pem
 
-	sudo service nginx start
+	service nginx start
 fi
 
-sudo rm -rf $temp_certs
+rm -rf $temp_certs
 echo "Last Run: $(date)" > $time_stamp

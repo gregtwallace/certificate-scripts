@@ -51,7 +51,7 @@ pfsense_cert_name="LeGo pfsense.example.com"
 set -e
 
 # Make folders if don't exist
-[ -d "$temp_certs" ] || mkdir "$temp_certs"
+mkdir -p "$temp_certs"
 
 # Check for python
 if [ ! -f $python_bin ] ; then

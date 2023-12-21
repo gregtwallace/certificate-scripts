@@ -43,33 +43,33 @@ time_stamp=/var/lib/unifi/cert_timestamp.txt
 # stop / fail on any error
 set -e
 
-sudo rm -rf $temp_certs
-sudo mkdir $temp_certs
-sudo mkdir -p $app_certs
+rm -rf $temp_certs
+mkdir -p $temp_certs
+mkdir -p $app_certs
 # Fetch certs, if curl returns anything other than 200 success, abort
-http_statuscode=$(sudo curl -L https://$server/$api_cert_path -H "apiKey: $cert_apikey" --output $temp_certs/certchain.pem --write-out "%{http_code}")
+http_statuscode=$(curl -L https://$server/$api_cert_path -H "apiKey: $cert_apikey" --output $temp_certs/certchain.pem --write-out "%{http_code}")
 if test $http_statuscode -ne 200; then exit "$http_statuscode"; fi
-http_statuscode=$(sudo curl -L https://$server/$api_key_path -H "apiKey: $key_apikey" --output $temp_certs/key.pem --write-out "%{http_code}")
+http_statuscode=$(curl -L https://$server/$api_key_path -H "apiKey: $key_apikey" --output $temp_certs/key.pem --write-out "%{http_code}")
 if test $http_statuscode -ne 200; then exit "$http_statuscode"; fi
 
 # if different
 if ( ! cmp -s "$temp_certs/certchain.pem" "$app_certs/certchain.pem" ) || ( ! cmp -s "$temp_certs/key.pem" "$app_certs/key.pem" ) ; then
-	sudo systemctl stop unifi
+	systemctl stop unifi
 
-	sudo cp -rf $temp_certs/* $app_certs/
-	sudo openssl pkcs12 -inkey $app_certs/key.pem -in $app_certs/certchain.pem -export -out $app_certs/certchain_key.pfx -passout pass:""
+	cp -rf $temp_certs/* $app_certs/
+	openssl pkcs12 -inkey $app_certs/key.pem -in $app_certs/certchain.pem -export -out $app_certs/certchain_key.pfx -passout pass:""
 
-	sudo chown $cert_owner:$cert_owner $app_certs/*
-	sudo chmod 600 $app_certs/key.pem
-	sudo chmod 600 $app_certs/certchain_key.pfx
-	sudo chmod 644 $app_certs/certchain.pem
+	chown $cert_owner:$cert_owner $app_certs/*
+	chmod 600 $app_certs/key.pem
+	chmod 600 $app_certs/certchain_key.pfx
+	chmod 644 $app_certs/certchain.pem
 
-  sudo keytool -delete -alias 1 -keystore $unifi_keystore -deststorepass "aircontrolenterprise"
-  sudo keytool -importkeystore -srckeystore $app_certs/certchain_key.pfx -srcstoretype PKCS12 -srcstorepass "" -destkeystore $unifi_keystore \
+  keytool -delete -alias 1 -keystore $unifi_keystore -deststorepass "aircontrolenterprise"
+  keytool -importkeystore -srckeystore $app_certs/certchain_key.pfx -srcstoretype PKCS12 -srcstorepass "" -destkeystore $unifi_keystore \
 		  -deststorepass "aircontrolenterprise" -destkeypass "aircontrolenterprise" -trustcacerts
 
-	sudo systemctl start unifi
+	systemctl start unifi
 fi
 
-sudo rm -rf $temp_certs
+rm -rf $temp_certs
 echo "Last Run: $(date)" > $time_stamp
