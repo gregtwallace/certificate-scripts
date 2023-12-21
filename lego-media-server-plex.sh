@@ -40,6 +40,9 @@ time_stamp=/home/plex/cert_timestamp.txt
 temp_certs=/tmp/tempcerts
 
 ## Script
+# stop / fail on any error
+set -e
+
 sudo rm -rf $temp_certs
 sudo mkdir $temp_certs
 sudo mkdir -p $plex_certs

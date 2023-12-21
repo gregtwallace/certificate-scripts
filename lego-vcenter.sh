@@ -49,6 +49,9 @@ time_stamp=/opt/lego/timestamp.txt
 vecs_cli="/usr/lib/vmware-vmafd/bin/vecs-cli"
 
 ## Script
+# stop / fail on any error
+set -e
+
 mkdir $temp_certs
 
 # Fetch LeGo cert

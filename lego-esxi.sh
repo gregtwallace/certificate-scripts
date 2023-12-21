@@ -58,6 +58,9 @@ time_stamp=/store/lego/timestamp.txt
 if [ ! -z $1 ]; then sleep "$1"; fi
 
 ####
+# stop / fail on any error
+set -e
+
 mkdir $temp_certs
 # Fetch LeGo
 http_statuscode=$(wget https://$server/$api_cert_path --header="apiKey: $cert_apikey" -O $temp_certs/rui.crt --server-response 2>&1 | tee /dev/tty | awk '/^  HTTP/{print $2}')

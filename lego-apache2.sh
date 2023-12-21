@@ -38,6 +38,9 @@ time_stamp=/etc/apache2/certs/cert_timestamp.txt
 temp_certs=/tmp/tempcerts
 
 ## Script
+# stop / fail on any error
+set -e
+
 # Make folder if doesn't exist
 sudo [ -d "$temp_certs" ] || sudo mkdir "$temp_certs"
 

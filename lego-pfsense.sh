@@ -47,6 +47,9 @@ python_bin="/usr/local/bin/python3.9"
 pfsense_cert_name="LeGo pfsense.example.com"
 
 ## Script
+# stop / fail on any error
+set -e
+
 # Make folders if don't exist
 [ -d "$temp_certs" ] || mkdir "$temp_certs"
 

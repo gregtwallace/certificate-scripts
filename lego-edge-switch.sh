@@ -75,6 +75,9 @@ temp_certs=/tmp/edgeswcerts
 
 
 ## Script
+# stop / fail on any error
+set -e
+
 # Check if expect is installed
 if ! command -v /usr/bin/expect &> /dev/null; then echo "This script requires expect but it's not installed.";exit 1;fi
 

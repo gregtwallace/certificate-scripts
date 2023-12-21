@@ -60,6 +60,9 @@ temp_certs=/tmp/goracadm
 
 
 ## Script
+# stop / fail on any error
+set -e
+
 # Make folders if don't exist
 sudo [ -d "$temp_certs" ] || sudo mkdir "$temp_certs"
 

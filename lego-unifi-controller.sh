@@ -40,6 +40,9 @@ temp_certs=/tmp/tempcerts
 time_stamp=/var/lib/unifi/cert_timestamp.txt
 
 ## Script
+# stop / fail on any error
+set -e
+
 sudo rm -rf $temp_certs
 sudo mkdir $temp_certs
 sudo mkdir -p $app_certs
