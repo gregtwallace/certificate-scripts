@@ -42,12 +42,12 @@ time_stamp=/root/lego/timestamp.txt
 # stop / fail on any error
 set -e
 
-mkdir $temp_certs
+mkdir -p $temp_certs
 # Fetch LeGo
 http_statuscode=$(wget https://$server/$api_cert_path --header="apiKey: $cert_apikey" -O $temp_certs/cert.pem --server-response 2>&1 | tee /dev/tty | awk '/^  HTTP/{print $2}')
-if test $http_statuscode -ne 200; then exit 1; fi
+if [[ $http_statuscode -ne 200 ]]; then exit 1; fi
 http_statuscode=$(wget https://$server/$api_key_path --header="apiKey: $key_apikey" -O $temp_certs/key.pem --server-response 2>&1 | tee /dev/tty | awk '/^  HTTP/{print $2}')
-if test $http_statuscode -ne 200; then exit 1; fi
+if [[ $http_statuscode -ne 200 ]]; then exit 1; fi
 
 # concat to expected single file
 cat $temp_certs/key.pem > $temp_certs/xapi-ssl.pem
