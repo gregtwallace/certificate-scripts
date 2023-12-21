@@ -26,30 +26,15 @@ set -e
 cd "${0%/*}"
 
 # go racadm binary (https://github.com/gregtwallace/goracadm)
+# ver >= 0.1.4
 racadm_cmd=./goracadm-amd64-linux
 # racadm strict mode flag ("-S " for strict, "" for insecure)
 strict_mode="-S "
 
-# temp owner/folder
-cert_owner=legocerthub:legocerthub
-temp_certs=/tmp/goracadm_post_temp
-
 ## Script
-# Make folder if no exist
-[ -d "$temp_certs" ] || mkdir "$temp_certs"
-chmod 700 "$temp_certs"
-
 # no need to compare anything -- if this file runs it is due to a new certificate
 
-# make files for new key cert (racadm requires file)
-printenv LEGO_PRIVATE_KEY_PEM > $temp_certs/$(printenv IDRAC_HOST).key.pem
-printenv LEGO_CERTIFICATE_PEM > $temp_certs/$(printenv IDRAC_HOST).certchain.pem
-
 # Install new key and cert and reset
-$racadm_cmd ${strict_mode}-r "$(printenv IDRAC_HOST)" -u "$(printenv IDRAC_USER)" -p "$(printenv IDRAC_PASSWORD)" sslkeyupload -t 1 -f $temp_certs/$(printenv IDRAC_HOST).key.pem
-$racadm_cmd ${strict_mode}-r "$(printenv IDRAC_HOST)" -u "$(printenv IDRAC_USER)" -p "$(printenv IDRAC_PASSWORD)" sslcertupload -t 1 -f $temp_certs/$(printenv IDRAC_HOST).certchain.pem
+$racadm_cmd ${strict_mode}-r "$(printenv IDRAC_HOST)" -u "$(printenv IDRAC_USER)" -p "$(printenv IDRAC_PASSWORD)" sslkeyupload -t 1 -f "$(printenv LEGO_PRIVATE_KEY_PEM)"
+$racadm_cmd ${strict_mode}-r "$(printenv IDRAC_HOST)" -u "$(printenv IDRAC_USER)" -p "$(printenv IDRAC_PASSWORD)" sslcertupload -t 1 -f "$(printenv LEGO_CERTIFICATE_PEM)"
 $racadm_cmd ${strict_mode}-r "$(printenv IDRAC_HOST)" -u "$(printenv IDRAC_USER)" -p "$(printenv IDRAC_PASSWORD)" racreset
-
-# remove files
-rm -f $temp_certs/$(printenv IDRAC_HOST).key.pem
-rm -f $temp_certs/$(printenv IDRAC_HOST).certchain.pem
