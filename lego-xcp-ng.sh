@@ -54,10 +54,8 @@ cat $temp_certs/key.pem > $temp_certs/xapi-ssl.pem
 echo "" >> $temp_certs/xapi-ssl.pem
 cat $temp_certs/cert.pem >> $temp_certs/xapi-ssl.pem
 
-diffs=$(diff "$xcp_cert" "$temp_certs/xapi-ssl.pem")
-diffcode=$?
-
-if [ "$diffcode" != 0 ] ; then
+# use diff to check if file is different
+if ! diff -s "$xcp_cert" "$temp_certs/xapi-ssl.pem" ; then
 
 	#no need to stop anything
 
