@@ -49,9 +49,9 @@ if ( ! cmp -s "$temp_certs/certchain.pem" "$local_certs/certchain.pem" ) || ( ! 
     # make plex compatible key/certificate
     sudo openssl pkcs12 -inkey $temp_certs/key.pem -in $temp_certs/certchain.pem -export -out $temp_certs/certchain_key.pfx -passout pass:""
 
-    ## stop whatever container(s)
-	docker stop mycontainer1
-    docker stop mycontainer2
+    ## stop whatever services (that run the containers)
+	systemctl stop mycontainer1
+    systemctl stop mycontainer2
 
     cp -rf $temp_certs/* $local_certs/
 
@@ -60,9 +60,9 @@ if ( ! cmp -s "$temp_certs/certchain.pem" "$local_certs/certchain.pem" ) || ( ! 
     chmod 600 $local_certs/key.pem
     chmod 644 $local_certs/certchain.pem
 
-    ## start whatever container(s)
-    docker start mycontainer1
-    docker start mycontainer2
+    ## start whatever services (that run the containers)
+    systemctl start mycontainer1
+    systemctl start mycontainer2
 fi
 
 rm -rf $temp_certs
