@@ -46,7 +46,11 @@ set -e
 rm -rf $temp_certs
 mkdir -p $temp_certs
 mkdir -p $plex_certs
+chown $plex_user:$plex_user $plex_certs
+chmod 0755 $plex_certs
 mkdir -p $nginx_certs
+chown root:root $nginx_certs
+chmod 0755 $nginx_certs
 
 # Fetch certs, if curl returns anything other than 200 success, abort
 http_statuscode=$(-L curl https://$server/$api_cert_path -H "apiKey: $cert_apikey" --out $temp_certs/certchain.pem --write-out "%{http_code}")
@@ -60,9 +64,12 @@ if ( ! cmp -s "$temp_certs/certchain.pem" "$plex_certs/certchain.pem" ) || ( ! c
 	service plexmediaserver stop
 
 	cp -rf $temp_certs/* $plex_certs/
-	openssl pkcs12 -inkey $plex_certs/key.pem -in $plex_certs/certchain.pem -export -out $plex_certs/certchain_key.pfx -passout pass:""
 
-	chown $plex_user:$plex_user $plex_certs/*
+	openssl pkcs12 -export -out $temp_certs/certchain_key.p12 \
+		-certpbe AES-256-CBC -keypbe AES-256-CBC -macalg SHA256 \
+		-inkey $temp_certs/key.pem -in $temp_certs/certchain.pem \
+		-passout pass:
+
 	chown $plex_user:$plex_user $plex_certs/*
 
 	chmod 600 $plex_certs/key.pem
