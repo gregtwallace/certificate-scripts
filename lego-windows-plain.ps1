@@ -1,6 +1,6 @@
 # Created by Kody Salak (@KodySalak)
-# Certhub Certificate Fetcher/Importer that is somewhat automated
-# Grabs certificate and key from CertHub, converts it to a PKCS12, and imports to the System Personal Certificate Store in Windows.
+# CertWarden Certificate Fetcher/Importer that is somewhat automated
+# Grabs certificate and key from CertWarden, converts it to a PKCS12, and imports to the System Personal Certificate Store in Windows.
 # Version 2.0
 
 # This script assumes ZERO liability for services that it may affect.
@@ -12,9 +12,9 @@
 # Variables for script
 $CertificateAPIKey = "<certificate API key>"
 $KeyAPIKey = "<key API key>"
-$Server = "<certhubserver:port>"
-$CertHubCertName = "<display name of certificate in certhub>"
-$KeyName = "<display name of key in certhub>"
+$Server = "<certwardenserver:port>"
+$CertWardenCertName = "<display name of certificate in certwarden>"
+$KeyName = "<display name of key in certwarden>"
 $CertSubject = "<cert subject, e.g. testing.mytld.com>"
 
 # May need/want to edit
@@ -24,8 +24,8 @@ $PKCS12Password = "Password"
 
 # Shouldn't need to edit
 $EncryptedPassword = ConvertTo-SecureString -String $PKCS12Password -Force -AsPlainText
-$CertificateAPIURL = "legocerthub/api/v1/download/certificates/$CertHubCertName"
-$KeyAPIURL = "legocerthub/api/v1/download/privatekeys/$KeyName"
+$CertificateAPIURL = "certwarden/api/v1/download/certificates/$CertWardenCertName"
+$KeyAPIURL = "certwarden/api/v1/download/privatekeys/$KeyName"
 $CurrentCertExpireTime = (Get-ChildItem -Path "Cert:\LocalMachine\My" | Where-Object { $_.Subject -Like "*$CertSubject"} | Sort-Object -Property NotAfter -Descending | Select-Object -First 1).NotAfter
 $CertPath = "$TempCerts\certchain.crt"
 $KeyPath = "$TempCerts\key.key"
@@ -55,7 +55,7 @@ Else {
     Write-Host "$($TempCerts) exists."
 }
 
-# Download current LeGo certificate
+# Download current CertWarden certificate
 Try {
     Invoke-WebRequest -Uri "https://$Server/$CertificateAPIURL" -Method GET -Headers @{"apiKey" = "$CertificateAPIKey" } -OutFile "$TempCerts\certchain.crt"
 }
@@ -64,14 +64,14 @@ Catch {
     Exit-Failed
 }
 
-# cert object for LeGo cert
-$legoCert = New-Object Security.Cryptography.X509Certificates.X509Certificate2 "$TempCerts\certchain.crt"
+# cert object for CertWarden cert
+$wardenCert = New-Object Security.Cryptography.X509Certificates.X509Certificate2 "$TempCerts\certchain.crt"
 
-# If LeGo cert has longer validity (or doesn't exist on host yet), update
-If ($CurrentCertExpireTime -lt $legoCert.NotAfter -Or [string]::IsNullOrWhiteSpace($CurrentCertExpireTime)) {
+# If CertWarden cert has longer validity (or doesn't exist on host yet), update
+If ($CurrentCertExpireTime -lt $wardenCert.NotAfter -Or [string]::IsNullOrWhiteSpace($CurrentCertExpireTime)) {
     Write-Host "Newer certificate available, updating"
 
-    # Get key from CertHub
+    # Get key from CertWarden
     Try {
         Invoke-WebRequest -Uri "https://$Server/$KeyAPIURL" -Method GET -Headers @{"apiKey" = "$KeyAPIKey" } -OutFile "$TempCerts\key.key"
     }

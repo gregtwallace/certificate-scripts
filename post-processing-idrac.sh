@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Script to place on the LeGo server (e.g. ./data/scripts/this_script.sh) to then use as a post
+# Script to place on the Cert Warden server (e.g. ./data/scripts/this_script.sh) to then use as a post
 # processing script to install certificate onto a Dell iDRAC
 
 # Note: Only RSA keys seem to be supported on iDRAC.
@@ -8,7 +8,7 @@
 # Required additional binary:
 # goracadm-amd64-linux -- see: https://github.com/gregtwallace/goracadm
 
-# Required additional environment variables (in LeGo post processing setup):
+# Required additional environment variables (in Cert Warden post processing setup):
 # IDRAC_HOST - hostname or IP of the idrac (strongly prefer hostname for security)
 # IDRAC_USER - username to login to the idrac
 # IDRAC_PASSWORD - password for the above username to login to the idrac
@@ -35,6 +35,6 @@ strict_mode="-S "
 # no need to compare anything -- if this file runs it is due to a new certificate
 
 # Install new key and cert and reset
-$racadm_cmd ${strict_mode}-r "$(printenv IDRAC_HOST)" -u "$(printenv IDRAC_USER)" -p "$(printenv IDRAC_PASSWORD)" sslkeyupload -t 1 -f "$(printenv LEGO_PRIVATE_KEY_PEM)"
-$racadm_cmd ${strict_mode}-r "$(printenv IDRAC_HOST)" -u "$(printenv IDRAC_USER)" -p "$(printenv IDRAC_PASSWORD)" sslcertupload -t 1 -f "$(printenv LEGO_CERTIFICATE_PEM)"
+$racadm_cmd ${strict_mode}-r "$(printenv IDRAC_HOST)" -u "$(printenv IDRAC_USER)" -p "$(printenv IDRAC_PASSWORD)" sslkeyupload -t 1 -f "$(printenv CW_PRIVATE_KEY_PEM)"
+$racadm_cmd ${strict_mode}-r "$(printenv IDRAC_HOST)" -u "$(printenv IDRAC_USER)" -p "$(printenv IDRAC_PASSWORD)" sslcertupload -t 1 -f "$(printenv CW_CERTIFICATE_PEM)"
 $racadm_cmd ${strict_mode}-r "$(printenv IDRAC_HOST)" -u "$(printenv IDRAC_USER)" -p "$(printenv IDRAC_PASSWORD)" racreset

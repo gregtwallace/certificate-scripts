@@ -20,7 +20,7 @@
 # @reboot sleep 15 && /script/path/here
 # 5 4 * * 2 /script/path/here
 
-# /conf is a persisting path (e.g. use /conf/lego)
+# /conf is a persisting path (e.g. use /conf/certwarden)
 
 ## Set VARs in accord with environment
 cert_apikey=<cert API key>
@@ -31,10 +31,10 @@ server=certdp.local:port
 cert_name=pfsense.example.com
 
 # URL paths
-api_cert_path=legocerthub/api/v1/download/certificates/$cert_name
-api_key_path=legocerthub/api/v1/download/privatekeys/$cert_name
+api_cert_path=certwarden/api/v1/download/certificates/$cert_name
+api_key_path=certwarden/api/v1/download/privatekeys/$cert_name
 # path to store a timestamp to easily see when script last ran
-time_stamp=/conf/lego_timestamp.txt
+time_stamp=/conf/certwarden_timestamp.txt
 # temp folder
 temp_certs=/tmp/tempcerts
 
@@ -44,7 +44,7 @@ pfsense_config=/conf/config.xml
 # on what version of pfSense is installed)
 python_bin="/usr/local/bin/python3.9"
 # Descriptive name of the cert to update
-pfsense_cert_name="LeGo pfsense.example.com"
+pfsense_cert_name="certwarden pfsense.example.com"
 
 ## Script
 # stop / fail on any error

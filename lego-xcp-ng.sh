@@ -4,7 +4,7 @@
 # (e.g. owned by root with permissions of 700) to avoid
 # compromising the API Keys
 
-# I placed the script in /root/lego and it seems fine.
+# I placed the script in /root/certwarden and it seems fine.
 
 # Recommended cron -- run at boot (in case system was powered off
 # during a renewal, and run weekly)
@@ -14,7 +14,7 @@
 # @reboot sleep 15 && /script/path/here
 # 5 4 * * 2 /script/path/here
 
-# NOTE: If LeGo server is running on a VM, add sleep 300-600 to wait 5-10 minutes for
+# NOTE: If Cert Warden server is running on a VM, add sleep 300-600 to wait 5-10 minutes for
 # the VM to come up
 
 ## Set VARs in accord with environment
@@ -26,8 +26,8 @@ server=certdp.local:port
 cert_name=unifi.example.com
 
 # URL paths
-api_cert_path=legocerthub/api/v1/download/certificates/$cert_name
-api_key_path=legocerthub/api/v1/download/privatekeys/$cert_name
+api_cert_path=certwarden/api/v1/download/certificates/$cert_name
+api_key_path=certwarden/api/v1/download/privatekeys/$cert_name
 
 
 # other
@@ -36,14 +36,14 @@ cert_owner=root:root
 # temp folder
 temp_certs=/tmp/tempcerts
 # path to store a timestamp to easily see when script last ran
-time_stamp=/root/lego/timestamp.txt
+time_stamp=/root/certwarden/timestamp.txt
 
 ####
 # stop / fail on any error
 set -e
 
 mkdir -p $temp_certs
-# Fetch LeGo
+# Fetch Cert Warden
 http_statuscode=$(wget https://$server/$api_cert_path --header="apiKey: $cert_apikey" -O $temp_certs/cert.pem --server-response 2>&1 | tee /dev/tty | awk '/^  HTTP/{print $2}')
 if [[ $http_statuscode -ne 200 ]]; then exit 1; fi
 http_statuscode=$(wget https://$server/$api_key_path --header="apiKey: $key_apikey" -O $temp_certs/key.pem --server-response 2>&1 | tee /dev/tty | awk '/^  HTTP/{print $2}')

@@ -13,14 +13,14 @@ server=certdp.local:port
 cert_name=plex.example.com
 
 # URL paths
-api_cert_path=legocerthub/api/v1/download/certificates/$cert_name
-api_key_path=legocerthub/api/v1/download/privatekeys/$cert_name
+api_cert_path=certwarden/api/v1/download/certificates/$cert_name
+api_key_path=certwarden/api/v1/download/privatekeys/$cert_name
 # local user who will own certs
 cert_owner=root
 # local cert storage
-local_certs=/opt/lego/certs
+local_certs=/opt/certwarden/certs
 # path to store a timestamp to easily see when script last ran
-time_stamp=/opt/lego/timestamp.txt
+time_stamp=/opt/certwarden/timestamp.txt
 # temp folder
 temp_certs=$local_certs/temp
 
