@@ -36,6 +36,7 @@ set -e
 
 # Create temp directory for certs
 mkdir -p $temp_certs
+mkdir -p $time_stamp_dir
 
 # Special API key format required by Cert Warden for combined key & cert with chain download
 combined_apikey="$cert_apikey.$key_apikey"
