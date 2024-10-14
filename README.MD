@@ -1,3 +1,9 @@
+Disclaimer: These scripts are just examples. Thorough testing
+and error handling should be done before deploying any script
+to production. Some scripts may be user contributions for
+software I don't use, and am therefore unable to test peronally.
+Please exercise caution and common sense.
+
 This repo holds various scripts to fetch keys and certificates
 from a central host.
 
