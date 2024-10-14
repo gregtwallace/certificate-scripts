@@ -26,9 +26,9 @@ time_stamp=/opt/certera/timestamp.txt
 
 sudo mkdir $local_certs/temp
 # Fetch certs, if curl returns anything other than 200 success, abort
-http_statuscode=$(sudo curl https://$server/api/certificate/$cert_name -H "apiKey: $cert_apikey" --out $local_certs/temp/fullchain.pem --write-out "%{http_code}")
+http_statuscode=$(sudo curl https://$server/api/certificate/$cert_name -H "apiKey: $cert_apikey" --output $local_certs/temp/fullchain.pem --write-out "%{http_code}")
 if test $http_statuscode -ne 200; then exit "$http_statuscode"; fi
-http_statuscode=$(sudo curl https://$server/api/key/$cert_name -H "apiKey: $key_apikey" --out $local_certs/temp/privkey.pem --write-out "%{http_code}")
+http_statuscode=$(sudo curl https://$server/api/key/$cert_name -H "apiKey: $key_apikey" --output $local_certs/temp/privkey.pem --write-out "%{http_code}")
 if test $http_statuscode -ne 200; then exit "$http_statuscode"; fi
 
 # if different

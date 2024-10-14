@@ -67,9 +67,9 @@ for i in "${!idrac_list[@]}"; do
 	if [[ $? != 0 ]]; then continue; fi
 
 	# Fetch certera certs; end this iteration of the loop if curl doesn't work properly
-	http_statuscode=$(sudo curl https://$server/api/certificate/${idrac_list[$i]} -H "apiKey: ${cert_apikey[$i]}" --out $temp_certs/certchain.pem --write-out "%{http_code}" -G)
+	http_statuscode=$(sudo curl https://$server/api/certificate/${idrac_list[$i]} -H "apiKey: ${cert_apikey[$i]}" --output $temp_certs/certchain.pem --write-out "%{http_code}" -G)
 	if test $http_statuscode -ne 200; then continue; fi
-	http_statuscode=$(sudo curl https://$server/api/key/${idrac_list[$i]} -H "apiKey: ${key_apikey[$i]}" --out $temp_certs/key.pem --write-out "%{http_code}")
+	http_statuscode=$(sudo curl https://$server/api/key/${idrac_list[$i]} -H "apiKey: ${key_apikey[$i]}" --output $temp_certs/key.pem --write-out "%{http_code}")
 	if test $http_statuscode -ne 200; then continue; fi
 
 	# Split the pem chain to then combine the multiple files into a format drac will take
