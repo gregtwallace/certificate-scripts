@@ -29,6 +29,7 @@ pbs_key="/etc/proxmox-backup/proxy.key"
 cert_owner="root:backup"
 cert_permissions="640"
 temp_certs="/tmp/tempcerts"
+time_stamp_dir="/root/certwarden"
 time_stamp="/root/certwarden/timestamp.txt"
 
 # Stop the script on any error
