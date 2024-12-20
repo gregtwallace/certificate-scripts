@@ -24,8 +24,8 @@ cert_name="<your_certificate_name>"
 pve_node_name=$(hostname)  # Get the node name dynamically
 
 # Proxmox VE certificate and key paths
-pve_cert="/etc/pve/nodes/$pve_node_name/pve-ssl.pem"
-pve_key="/etc/pve/nodes/$pve_node_name/pve-ssl.key"
+pve_cert="/etc/pve/nodes/$pve_node_name/pveproxy-ssl.pem"
+pve_key="/etc/pve/nodes/$pve_node_name/pveproxy-ssl.key"
 cert_owner="root:www-data"
 cert_permissions="640"
 temp_certs="/tmp/tempcerts"
