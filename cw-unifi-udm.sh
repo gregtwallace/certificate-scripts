@@ -1,18 +1,17 @@
 #!/bin/bash
 
 # Script updates Unifi certchain and key. It also restarts
-# the UDM service.
+# the Nginx service.
 
 # This script should be securely placed with limited access
 # (e.g. owned by root with permissions of 700) to avoid
 # compromising the API Keys
 
-## Recommended cron -- run at boot (in case system was powered off
-# during a renewal, and run weekly)
-# Pick any time you like. This time was arbitrarily selected.
+## Recommended cron -- run at boot (unifi-core overwrites the certs on start)
+# Weekly - Pick any time you like. This time was arbitrarily selected.
 
 # sudo crontab -e
-# @reboot sleep 15 && /script/path/here
+# @reboot sleep 120 && /script/path/here
 # 5 4 * * 2 /script/path/here
 
 ## Set VARs in accord with environment
@@ -27,7 +26,7 @@ cert_name=unifi.example.com
 api_cert_path=certwarden/api/v1/download/certificates/$cert_name
 api_key_path=certwarden/api/v1/download/privatekeys/$cert_name
 # local user who will own certs
-cert_owner=unifi
+cert_owner=root
 # local cert storage
 local_certs=/data/unifi-core/config
 # path to store a timestamp to easily see when script last ran
@@ -50,8 +49,6 @@ if test $http_statuscode -ne 200; then exit "$http_statuscode"; fi
 
 # if different
 if ( ! cmp -s "$temp_certs/unifi-core.key" "$local_certs/unifi-core.key" ) || ( ! cmp -s "$temp_certs/unifi-core.crt" "$local_certs/unifi-core.crt" ) ; then
-	systemctl stop unifi
-
 	cp -rf $temp_certs/* $local_certs/
 
 	chown $cert_owner:$cert_owner $local_certs/unifi-core.key
@@ -60,7 +57,7 @@ if ( ! cmp -s "$temp_certs/unifi-core.key" "$local_certs/unifi-core.key" ) || ( 
 	chmod 644 $local_certs/unifi-core.key
 	chmod 644 $local_certs/unifi-core.crt
 
-	systemctl start unifi
+	nginx -s reload
 fi
 
 rm -rf $local_certs/temp
