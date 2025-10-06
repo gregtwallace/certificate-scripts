@@ -33,6 +33,9 @@ fi
 # stop / fail on any error
 set -e
 
+# Set umask
+umask 077
+
 mkdir -p $temp_certs
 mkdir -p $local_certs
 chown root:root $local_certs

@@ -38,6 +38,9 @@ time_stamp="$time_stamp_dir/timestamp.txt"
 # Exit on any error, treat unset variables as errors, and propagate errors in pipelines
 set -euo pipefail
 
+# Set umask
+umask 077
+
 # Enable debugging (optional, uncomment for detailed logs)
 # set -x
 

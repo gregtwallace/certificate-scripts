@@ -38,6 +38,9 @@ temp_certs=/tmp/tempcerts
 # stop / fail on any error
 set -e
 
+# Set umask
+umask 077
+
 rm -rf $temp_certs
 mkdir -p $temp_certs
 mkdir -p $local_certs
