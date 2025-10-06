@@ -54,7 +54,7 @@ if ( ! cmp -s "$temp_certs/unifi-core.key" "$local_certs/unifi-core.key" ) || ( 
 	chown $cert_owner:$cert_owner $local_certs/unifi-core.key
 	chown $cert_owner:$cert_owner $local_certs/unifi-core.crt
 
-	chmod 644 $local_certs/unifi-core.key
+	chmod 600 $local_certs/unifi-core.key
 	chmod 644 $local_certs/unifi-core.crt
 
 	nginx -s reload
