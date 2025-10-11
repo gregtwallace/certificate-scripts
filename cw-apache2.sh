@@ -41,6 +41,9 @@ temp_certs=/tmp/tempcerts
 # stop / fail on any error
 set -e
 
+# Set umask
+umask 077
+
 # Make folder if doesn't exist
 mkdir -p "$temp_certs"
 

@@ -50,6 +50,9 @@ pfsense_cert_name="certwarden pfsense.example.com"
 # stop / fail on any error
 set -e
 
+# Set umask
+umask 077
+
 # Make folders if don't exist
 mkdir -p "$temp_certs"
 

@@ -35,6 +35,9 @@ time_stamp="/root/certwarden/timestamp.txt"
 # Stop the script on any error
 set -e
 
+# Set umask
+umask 077
+
 # Create temp directory for certs
 mkdir -p $temp_certs
 mkdir -p $time_stamp_dir

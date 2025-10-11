@@ -43,6 +43,9 @@ time_stamp=/var/lib/unifi/cert_timestamp.txt
 # stop / fail on any error
 set -e
 
+# Set umask
+umask 077
+
 rm -rf $temp_certs
 mkdir -p $temp_certs
 mkdir -p $app_certs

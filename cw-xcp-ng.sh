@@ -42,6 +42,9 @@ time_stamp=/root/certwarden/timestamp.txt
 # stop / fail on any error
 set -e
 
+# Set umask
+umask 077
+
 mkdir -p $temp_certs
 # Fetch Cert Warden
 http_statuscode=$(wget https://$server/$api_cert_path --header="apiKey: $cert_apikey" -O $temp_certs/cert.pem --server-response 2>&1 | tee /dev/tty | awk '/^  HTTP/{print $2}')

@@ -47,6 +47,9 @@ time_stamp="$time_stamp_dir/timestamp.txt"
 # Stop the script on any error
 set -e
 
+# Set umask
+umask 077
+
 # Create temp directory for certs and timestamp directory if they don't exist
 mkdir -p $temp_certs
 mkdir -p $time_stamp_dir
