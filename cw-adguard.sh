@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Script updates AdGuard certchain and key. It also restarts
 # the AdGuard service.
