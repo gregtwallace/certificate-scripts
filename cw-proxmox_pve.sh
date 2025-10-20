@@ -63,7 +63,7 @@ if [ ! -s "$temp_certs/pve-ssl.pem" ] || [ ! -s "$temp_certs/pve-ssl.key" ]; the
 fi
 
 # Compare the new certificate with the existing one
-if ! diff -s "$pve_cert" "$temp_certs/pve-ssl.pem"; then
+if ! diff -s "$pve_cert" "$temp_certs/pve-ssl.pem" > /dev/null; then
     # If different, update the Proxmox VE certificate and key
     cp -f "$temp_certs/pve-ssl.pem" "$pve_cert"
     cp -f "$temp_certs/pve-ssl.key" "$pve_key"
