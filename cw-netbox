@@ -1,0 +1,195 @@
+#!/bin/sh
+# Netbox Certificate Auto-Update Script
+# This script downloads SSL certificates from CertWarden and updates Netbox.
+# 
+# Security: Place this script with limited access (e.g., owned by root with permissions 700)
+# to protect the API keys.
+#
+# Installation:
+#   chmod +x /opt/certwarden/cw-netbox.sh
+#
+# Recommended cron schedule (runs at boot and weekly):
+#   sudo crontab -e
+#   @reboot sleep 15 && /opt/certwarden/cw-netbox.sh
+#   5 4 * * 2 /opt/certwarden/cw-netbox.sh
+#
+# Netbox SSL Setup:
+# Configure SSL for Apache or Nginx per Netbox documentation:
+# https://netbox.readthedocs.io/en/stable/installation/5-http-server/
+#   - Apache: Edit /etc/apache2/sites-available/netbox.conf and update ServerName
+#   - Nginx: Edit /etc/nginx/sites-available/netbox and update server_name directive
+#
+# Note: If Cert Warden runs on a VM, add sleep 300-600 at the start to allow VM startup.
+
+# Variables (Replace placeholders with your actual values)
+cert_apikey="<your_cert_api_key>"
+key_apikey="<your_key_api_key>"
+server="<your_cert_warden_server>:<port>"
+cert_name="<your_certificate_name>"
+
+# Netbox certificate and key paths
+netbox_cert_root="/etc/ssl"
+netbox_cert_dir="/etc/ssl/certs"
+netbox_key_dir="/etc/ssl/private"
+netbox_cert="/etc/ssl/certs/netbox.crt"
+netbox_key="/etc/ssl/private/netbox.key"
+cert_owner="root:root"  # Use the appropriate user and group for Netbox
+cert_permissions="640"
+temp_certs="/tmp/tempcerts"
+time_stamp_dir="/root/certwarden"
+time_stamp="$time_stamp_dir/timestamp.txt"
+
+# Web server type (apache or nginx)
+web_server="apache"  # Change to "apache" if using Apache
+
+# Logging
+log_file="$time_stamp_dir/netbox-cert-update.log"
+lock_file="$time_stamp_dir/netbox-cert-update.lock"
+
+# Stop the script on any error
+set -e
+
+# Set umask for secure file creation
+umask 077
+
+# Function to log messages
+log_message() {
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" | tee -a "$log_file"
+}
+
+# Function to cleanup on exit
+cleanup() {
+    rm -rf "$temp_certs"
+    rm -f "$lock_file"
+}
+
+# Set trap to cleanup on exit
+trap cleanup EXIT INT TERM
+
+# Create required directories only if they don't exist
+[ -d "$temp_certs" ] || mkdir -p "$temp_certs"
+[ -d "$time_stamp_dir" ] || mkdir -p "$time_stamp_dir"
+[ -d "$netbox_cert_dir" ] || mkdir -p "$netbox_cert_dir"
+[ -d "$netbox_key_dir" ] || mkdir -p "$netbox_key_dir"
+
+# Check for lock file to prevent concurrent runs
+if [ -f "$lock_file" ]; then
+    log_message "ERROR: Another instance is already running (lock file exists)"
+    exit 1
+fi
+
+# Create lock file
+echo $$ > "$lock_file"
+
+log_message "Starting Netbox certificate update check"
+
+# URL encode the certificate name for safety
+cert_name_encoded=$(echo "$cert_name" | sed 's/ /%20/g')
+
+# Set wget options for self-signed certificates if needed
+if [ "$allow_self_signed" = true ]; then
+    wget_opts="--no-check-certificate"
+else
+    wget_opts=""
+fi
+
+# Fetch certificate and chain from Cert Warden
+log_message "Downloading certificate from Cert Warden..."
+http_statuscode=$(wget "https://$server/certwarden/api/v1/download/certificates/$cert_name_encoded" \
+    --header="X-API-Key: $cert_apikey" \
+    -O "$temp_certs/netbox-ssl.pem" \
+    --no-verbose \
+    $wget_opts \
+    --server-response 2>&1 | awk '/^  HTTP/{print $2}')
+
+if [ "$http_statuscode" -ne 200 ]; then
+    log_message "ERROR: Failed to fetch certificate. HTTP Status Code: $http_statuscode"
+    exit 1
+fi
+
+# Fetch private key from Cert Warden
+log_message "Downloading private key from Cert Warden..."
+http_statuscode=$(wget "https://$server/certwarden/api/v1/download/privatekeys/$cert_name_encoded" \
+    --header="X-API-Key: $key_apikey" \
+    -O "$temp_certs/netbox-ssl.key" \
+    --no-verbose \
+    $wget_opts \
+    --server-response 2>&1 | awk '/^  HTTP/{print $2}')
+
+if [ "$http_statuscode" -ne 200 ]; then
+    log_message "ERROR: Failed to fetch private key. HTTP Status Code: $http_statuscode"
+    exit 1
+fi
+
+# Verify that the files are not empty
+if [ ! -s "$temp_certs/netbox-ssl.pem" ] || [ ! -s "$temp_certs/netbox-ssl.key" ]; then
+    log_message "ERROR: One or more downloaded files are empty"
+    exit 1
+fi
+
+# Validate certificate and key match (works for RSA, ECDSA, ED25519, etc.)
+log_message "Validating certificate and key..."
+cert_pubkey=$(openssl x509 -in "$temp_certs/netbox-ssl.pem" -noout -pubkey 2>/dev/null)
+key_pubkey=$(openssl pkey -in "$temp_certs/netbox-ssl.key" -pubout 2>/dev/null)
+
+if [ "$cert_pubkey" != "$key_pubkey" ]; then
+    log_message "ERROR: Certificate and private key do not match"
+    exit 1
+fi
+
+log_message "Certificate and key validation successful"
+
+# Check certificate expiration
+if ! openssl x509 -checkend 86400 -noout -in "$temp_certs/netbox-ssl.pem" > /dev/null 2>&1; then
+    log_message "WARNING: Certificate expires within 24 hours"
+fi
+
+# Check if destination certificate exists and has content
+if [ ! -s "$netbox_cert" ] || [ ! -s "$netbox_key" ]; then
+    log_message "Destination certificate does not exist or is empty, installing new certificate..."
+    force_update=true
+else
+    force_update=false
+fi
+
+# Compare the new certificate with the existing one (skip if force_update is true)
+if [ "$force_update" = true ] || ! diff -q "$netbox_cert" "$temp_certs/netbox-ssl.pem" > /dev/null 2>&1; then
+    log_message "Certificate has changed, updating..."
+    
+    # Certificate has changed, update Netbox certificate and key
+    cp -f "$temp_certs/netbox-ssl.pem" "$netbox_cert"
+    cp -f "$temp_certs/netbox-ssl.key" "$netbox_key"
+    
+    # Set ownership and permissions
+    chown "$cert_owner" "$netbox_cert" "$netbox_key"
+    chmod "$cert_permissions" "$netbox_cert" "$netbox_key"
+
+    # Restart web server to apply the new certificate
+    if [ "$web_server" = "nginx" ]; then
+        if systemctl reload nginx >> "$log_file" 2>&1; then
+            log_message "SUCCESS: Certificate updated and Nginx reloaded"
+        else
+            log_message "ERROR: Failed to reload Nginx"
+            exit 1
+        fi
+    elif [ "$web_server" = "apache" ]; then
+        if systemctl reload apache2 >> "$log_file" 2>&1; then
+            log_message "SUCCESS: Certificate updated and Apache reloaded"
+        else
+            log_message "ERROR: Failed to reload Apache"
+            exit 1
+        fi
+    else
+        log_message "WARNING: Certificate updated, but web server not restarted (unknown type: $web_server)"
+    fi
+    
+    # Log certificate details
+    cert_subject=$(openssl x509 -noout -subject -in "$netbox_cert" 2>/dev/null | sed 's/subject=//')
+    cert_expiry=$(openssl x509 -noout -enddate -in "$netbox_cert" 2>/dev/null | sed 's/notAfter=//')
+    log_message "Certificate subject: $cert_subject"
+    log_message "Certificate expires: $cert_expiry"
+else
+    log_message "Certificate is already up to date, no changes needed"
+fi
+
+log_message "Certificate update check completed successfully"
