@@ -55,8 +55,7 @@ if test $http_statuscode -ne 200; then exit "$http_statuscode"; fi
 
 # if different
 if ( ! cmp -s "$temp_certs/certchain.pem" "$local_certs/certchain.pem" ) || ( ! cmp -s "$temp_certs/key.pem" "$local_certs/key.pem" ) ; then
-	service AdGuardHome stop
-
+	
 	cp -rf $temp_certs/* $local_certs/
 
 	chown $cert_owner:$cert_owner $local_certs/*
@@ -64,8 +63,11 @@ if ( ! cmp -s "$temp_certs/certchain.pem" "$local_certs/certchain.pem" ) || ( ! 
 	chmod 600 $local_certs/key.pem
 	chmod 644 $local_certs/certchain.pem
 
-	service AdGuardHome start
+	# Send SIGHUP
+	test -e /run/adguardhome.pid && kill -s SIGHUP `cat /run/adguardhome.pid`
 fi
 
+# Cleanup
 rm -rf $local_certs/temp
+
 echo "Last Run: $(date)" > $time_stamp
