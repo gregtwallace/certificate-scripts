@@ -1,5 +1,9 @@
 #!/bin/sh
 
+# NOTE: As of v0.107.72, AdGuard Home is supposed to monitor cert
+# files and therefore the service restart below should not be
+# needed for more recent version.
+
 # Script updates AdGuard certchain and key. It also restarts
 # the AdGuard service.
 
