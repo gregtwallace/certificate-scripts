@@ -19,13 +19,14 @@ $CertSubject = "<cert subject, e.g. testing.mytld.com>"
 
 # May need/want to edit
 $TempCerts = "C:\Windows\temp\tempcerts"
-$OpenSSLLocation = "C:\Program Files\OpenSSL-Win64\bin\openssl.exe"
-$PKCS12Password = "Password"
+
+$PKCS12Password = $KeyAPIKey
 
 # Shouldn't need to edit
 $EncryptedPassword = ConvertTo-SecureString -String $PKCS12Password -Force -AsPlainText
 $CertificateAPIURL = "certwarden/api/v1/download/certificates/$CertWardenCertName"
 $KeyAPIURL = "certwarden/api/v1/download/privatekeys/$KeyName"
+$pfxCertificateAPIURL = "certwarden/api/v1/download/pfx/$CertWardenCertName"
 $CurrentCertExpireTime = (Get-ChildItem -Path "Cert:\LocalMachine\My" | Where-Object { $_.Subject -Like "*$CertSubject"} | Sort-Object -Property NotAfter -Descending | Select-Object -First 1).NotAfter
 $CertPath = "$TempCerts\certchain.crt"
 $KeyPath = "$TempCerts\key.key"
@@ -74,15 +75,13 @@ If ($CurrentCertExpireTime -lt $wardenCert.NotAfter -Or [string]::IsNullOrWhiteS
     # Get key from CertWarden
     Try {
         Invoke-WebRequest -Uri "https://$Server/$KeyAPIURL" -Method GET -Headers @{"apiKey" = "$KeyAPIKey" } -OutFile "$TempCerts\key.key"
+        Invoke-WebRequest -Uri "https://$Server/$pfxCertificateAPIURL" -Method GET -Headers @{"apiKey" = "$CertificateAPIKey.$KeyAPIKey" } -OutFile $PKCS12Path
     }
     Catch {
-        Write-Host "ERROR: FAILED TO GET KEY: $($_)"
+        Write-Host "ERROR: FAILED TO GET KEY or PFX file: $($_)"
         Exit-Failed
     }
 
-    # Convert the certificate and private key into a PKCS12 file
-    & $OpenSSLLocation pkcs12 -export -out $PKCS12Path -inkey $KeyPath -in $CertPath -passout "pass:$PKCS12Password"
-    
     # Import the PKCS12 file into the Local Machine Personal certificate store
     Import-PfxCertificate -FilePath $PKCS12Path -Password $EncryptedPassword -CertStoreLocation "cert:\LocalMachine\My"
     
