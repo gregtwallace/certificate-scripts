@@ -74,7 +74,6 @@ If ($CurrentCertExpireTime -lt $wardenCert.NotAfter -Or [string]::IsNullOrWhiteS
 
     # Get key from CertWarden
     Try {
-        Invoke-WebRequest -Uri "https://$Server/$KeyAPIURL" -Method GET -Headers @{"apiKey" = "$KeyAPIKey" } -OutFile "$TempCerts\key.key"
         Invoke-WebRequest -Uri "https://$Server/$pfxCertificateAPIURL" -Method GET -Headers @{"apiKey" = "$CertificateAPIKey.$KeyAPIKey" } -OutFile $PKCS12Path
     }
     Catch {
