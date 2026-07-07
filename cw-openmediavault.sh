@@ -1,4 +1,23 @@
 #!/bin/bash
+
+#Script created by Justin Ritter @Nodework
+#For help please refer to https://nodework.de
+
+# Script updates Openmediavault certchain and key. It also restarts
+# the nginx service.
+
+# This script should be securely placed with limited access
+# (e.g. owned by root with permissions of 700) to avoid
+# compromising the API Keys
+
+## Recommended cron -- run at boot (in case system was powered off
+# during a renewal, and run weekly)
+# Pick any time you like. This time was arbitrarily selected.
+
+# sudo crontab -e
+# @reboot sleep 15 && /script/path/here
+# 5 4 * * 2 /script/path/here
+
 set -e
 
 . /usr/share/openmediavault/scripts/helper-functions
